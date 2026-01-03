@@ -11,10 +11,16 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Construct target URL
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
-  const query = searchParams.toString();
-  const targetUrl = `http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do?${query}`;
+  // Inject Credentials (Server-side)
+  // ID: 5775, PW: *suoho1004
+  if (!searchParams.has('id')) {
+      searchParams.append('id', process.env.GARAK_ID || '5775');
+  }
+  if (!searchParams.has('passwd')) {
+      searchParams.append('passwd', process.env.GARAK_PW || '*suoho1004');
+  }
+
+  const targetUrl = `http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do?${searchParams.toString()}`;
 
   try {
     const response = await fetch(targetUrl, {
