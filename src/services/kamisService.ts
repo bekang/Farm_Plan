@@ -48,13 +48,8 @@ export class KamisService {
     categoryCode?: string,
   ): Promise<KamisPriceItem[]> {
     // If no credentials, force fallback immediately
-    if (!CERT_ID || !CERT_KEY) {
-      // Quietly warn in dev, but don't spam
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('KAMIS Credentials missing, using Mock Data.');
-      }
-      return this.getFallbackData(categoryCode);
-    }
+    // Credentials are now handled by the server-side proxy (api/kamis.js)
+    // We proceed to call the API even if client-side keys are missing.
 
     try {
       const attempts = 3;
@@ -89,7 +84,8 @@ export class KamisService {
         }
 
         try {
-          const response = await fetch(`${API_BASE_URL}/service/price/xml.do?${params.toString()}`);
+          // Use Vercel Serverless Function
+          const response = await fetch(`/api/kamis?${params.toString()}`);
           
           if (!response.ok) {
              // Server error, try previous day
