@@ -58,7 +58,7 @@ export function PestWidget({
 
       {isActive && (
         <div
-          className={cn('absolute right-0 top-full z-50 mt-2 w-72', EFFECTS.ANIMATION.FADE_IN_DOWN)}
+          className={cn('absolute right-0 top-full z-[1000] mt-2 w-72', EFFECTS.ANIMATION.FADE_IN_DOWN)}
         >
           <Card className="border-slate-200 p-4 shadow-xl">
             <div className="mb-3 flex items-start justify-between">

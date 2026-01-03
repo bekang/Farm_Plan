@@ -123,7 +123,7 @@ export function WeatherWidget({
 
       {isActive && (
         <div
-          className={cn('absolute right-0 top-full z-50 mt-2 w-72', EFFECTS.ANIMATION.FADE_IN_DOWN)}
+          className={cn('absolute right-0 top-full z-[1000] mt-2 w-72', EFFECTS.ANIMATION.FADE_IN_DOWN)}
         >
           <Card className="overflow-hidden border-slate-200 shadow-xl">
             {/* Header with Location */}
