@@ -1,16 +1,4 @@
-import fetch from 'node-fetch';
-
-import fetch from 'node-fetch';
-
 export default async function handler(req, res) {
-  // CORS Handling
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  // ... (keeping headers logic implied, but replace_file_content replaces range)
-  // Wait, I need to be careful with range.
-  // Let's replace the top to add import, and the middle to remove check.
-  // Actually, I can't do two disparate blocks in one ReplaceFileContent call unless I use MultiReplace.
-  // I will use MultiReplace.
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
