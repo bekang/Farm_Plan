@@ -39,8 +39,8 @@ export const WeatherService = {
     try {
       if (!API_KEY) throw new Error("No API Key");
 
-      // NOTE: Using '/api/public' proxy to avoid CORS
-      const url = `/api/public/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?serviceKey=${API_KEY}&pageNo=1&numOfRows=60&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
+      // Use Vercel Serverless Function
+      const url = `/api/weather?serviceKey=${API_KEY}&pageNo=1&numOfRows=60&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not ok');
