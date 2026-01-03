@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
   // Target: NCPMS Pest Forecast
   // Service sends params for pestForecastList
-  const targetUrl = `https://api.nongsaro.go.kr/npmsAPI/service/pest/pestForecastList?${searchParams.toString()}`;
+  const targetUrl = `https://ncpms.rda.go.kr/npmsAPI/service/pest/pestForecastList?${searchParams.toString()}`;
 
   try {
     // node-fetch is imported, no check needed
