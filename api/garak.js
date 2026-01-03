@@ -1,4 +1,16 @@
+import fetch from 'node-fetch';
+
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
+  // CORS Handling
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  // ... (keeping headers logic implied, but replace_file_content replaces range)
+  // Wait, I need to be careful with range.
+  // Let's replace the top to add import, and the middle to remove check.
+  // Actually, I can't do two disparate blocks in one ReplaceFileContent call unless I use MultiReplace.
+  // I will use MultiReplace.
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,9 +35,7 @@ export default async function handler(req, res) {
   const targetUrl = `http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do?${searchParams.toString()}`;
 
   try {
-    if (typeof fetch === 'undefined') {
-        throw new Error('Global fetch is not defined in this Node environment');
-    }
+    // node-fetch is imported, no check needed
 
     const response = await fetch(targetUrl, {
       method: "GET",

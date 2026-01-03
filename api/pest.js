@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -23,9 +25,7 @@ export default async function handler(req, res) {
   const targetUrl = `https://ncpms.rda.go.kr/npmsAPI/service/pest/pestForecastList?${searchParams.toString()}`;
 
   try {
-    if (typeof fetch === 'undefined') {
-        throw new Error('Global fetch is not defined in this Node environment');
-    }
+    // node-fetch is imported, no check needed
 
     const response = await fetch(targetUrl, {
       method: "GET",
