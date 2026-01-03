@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       searchParams.append('p_cert_id', process.env.KAMIS_ID || '7036');
   }
   
-  const targetUrl = `http://www.kamis.or.kr/service/price/xml.do?${searchParams.toString()}`;
+  const targetUrl = `https://www.kamis.or.kr/service/price/xml.do?${searchParams.toString()}`;
 
   try {
     // node-fetch is imported, no check needed

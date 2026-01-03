@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   // The screenshot key looks alphanumeric (hex-like), so it might not need encoding. 
   // 'b4d6...' is purely hex, so it's safe.
   
-  const targetUrl = `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${searchParams.toString()}`;
+  const targetUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${searchParams.toString()}`;
 
   try {
     // node-fetch is imported, no check needed

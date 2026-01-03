@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 
   const query = searchParams.toString();
 
-  const targetUrl = `http://api.nongsaro.go.kr${path}?${query}`;
+  const targetUrl = `https://api.nongsaro.go.kr${path}?${query}`;
 
   try {
     // node-fetch is imported, no check needed

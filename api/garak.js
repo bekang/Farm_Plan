@@ -25,6 +25,7 @@ export default async function handler(req, res) {
 
   // Inject Credentials (Server-side)
   // ID: 5775, PW: *suoho1004
+  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
   if (!searchParams.has('id')) {
       searchParams.append('id', process.env.GARAK_ID || '5775');
   }
@@ -32,7 +33,8 @@ export default async function handler(req, res) {
       searchParams.append('passwd', process.env.GARAK_PW || '*suoho1004');
   }
 
-  const targetUrl = `http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do?${searchParams.toString()}`;
+  // Use HTTPS
+  const targetUrl = `https://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do?${searchParams.toString()}`;
 
   try {
     // node-fetch is imported, no check needed
