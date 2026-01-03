@@ -22,7 +22,10 @@ export default async function handler(req, res) {
 
   const targetUrl = `http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do?${searchParams.toString()}`;
 
-  try {
+    if (typeof fetch === 'undefined') {
+        throw new Error('Global fetch is not defined in this Node environment');
+    }
+
     const response = await fetch(targetUrl, {
       method: "GET",
       headers: {
@@ -35,18 +38,27 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-        throw new Error(`Upstream API responded with ${response.status}`);
+        const text = await response.text();
+        throw new Error(`Upstream API responded with ${response.status}: ${text.substring(0, 200)}`);
     }
 
-    const data = await response.json();
-    res.status(200).json(data);
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+         const data = await response.json();
+         res.status(200).json(data);
+    } else {
+         const text = await response.text();
+         // If it's not JSON, it might be an HTML error page from the target
+         throw new Error(`Expected JSON but got ${contentType}: ${text.substring(0, 100)}`);
+    }
 
   } catch (error) {
     console.error('Garak API Proxy Error:', error);
     res.status(500).json({ 
         error: 'Failed to fetch data from Garak Market', 
         details: error.message,
-        mockFallback: true
+        stack: error.stack,
+        targetUrl // Debugging aid (be careful with logs, but targetUrl here is internal proxy const)
     });
   }
 }

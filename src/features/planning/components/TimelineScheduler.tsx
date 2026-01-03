@@ -279,7 +279,7 @@ export function TimelineScheduler({ plans, fieldName }: { plans: any[], fieldNam
           
           <DateHeader 
             unit="year" 
-            labelFormat={(date: any) => date.format("YYYY")}
+            labelFormat={(date: any) => moment(date).format("YYYY")}
             className="h-6 bg-slate-100 text-xs text-slate-500 border-b border-slate-200"
             intervalRenderer={({ getIntervalProps, intervalContext }) => {
                 return (
@@ -292,7 +292,7 @@ export function TimelineScheduler({ plans, fieldName }: { plans: any[], fieldNam
 
           <DateHeader 
             unit="month" 
-            labelFormat={(date: any) => date.format("M월")}
+            labelFormat={(date: any) => moment(date).format("M월")}
             className="h-7 text-xs font-medium"
             intervalRenderer={({ getIntervalProps, intervalContext }) => {
                 const isEven = intervalContext.interval.startTime.month() % 2 === 0;
@@ -307,7 +307,7 @@ export function TimelineScheduler({ plans, fieldName }: { plans: any[], fieldNam
           {showDayHeader && (
               <DateHeader 
                   unit="day" 
-                  labelFormat={(date: any) => date.format("D")}
+                  labelFormat={(date: any) => moment(date).format("D")}
                   className="h-5 text-[10px] text-slate-400 bg-white border-b border-slate-100"
               />
           )}

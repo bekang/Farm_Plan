@@ -23,6 +23,10 @@ export default async function handler(req, res) {
   const targetUrl = `https://ncpms.rda.go.kr/npmsAPI/service/pest/pestForecastList?${searchParams.toString()}`;
 
   try {
+    if (typeof fetch === 'undefined') {
+        throw new Error('Global fetch is not defined in this Node environment');
+    }
+
     const response = await fetch(targetUrl, {
       method: "GET",
       headers: {
@@ -31,19 +35,20 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-        throw new Error(`Upstream API responded with ${response.status}`);
+        const text = await response.text();
+        throw new Error(`Upstream API responded with ${response.status}: ${text.substring(0, 200)}`);
     }
 
-    // NCPMS returns XML. We forward it as text/xml so the frontend DOMParser can handle it.
     const text = await response.text();
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(text);
 
   } catch (error) {
-    console.error('Pest API Proxy Error:', error);
+    console.error('Pest Forecast Proxy Error:', error);
     res.status(500).json({ 
         error: 'Failed to fetch pest data', 
-        details: error.message 
+        details: error.message,
+        debug: { targetUrl }
     });
   }
 }
