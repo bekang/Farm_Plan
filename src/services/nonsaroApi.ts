@@ -5,16 +5,12 @@ const API_KEY = import.meta.env.VITE_NONGSARO_KEY || '';
 
 export const NonsaroApi = {
   async searchCrop(query: string): Promise<Crop[]> {
-    if (!API_KEY) {
-        console.warn("Nongsaro API Key missing");
-        return [];
-    }
-
     try {
         // Example: Searching variety info to get crop list
         // Path: /service/varietyInfo/getVarietyList
+        // Note: apiKey is now injected by the server-side proxy (api/nongsaro.js)
         const path = '/service/varietyInfo/getVarietyList';
-        const url = `/api/nongsaro?path=${path}&apiKey=${API_KEY}&svcCode=SVC01&serviceType=AA001&subCategoryCode=CROP&cropName=${encodeURIComponent(query)}`;
+        const url = `/api/nongsaro?path=${path}&svcCode=SVC01&serviceType=AA001&subCategoryCode=CROP&cropName=${encodeURIComponent(query)}`;
 
         const response = await fetch(url);
         if (!response.ok) return [];

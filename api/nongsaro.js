@@ -37,6 +37,13 @@ export default async function handler(req, res) {
   
   // Remove 'path' from params to forward the rest
   searchParams.delete('path');
+  
+  // Inject API Key (Server-side)
+  // This hides the key from the client and ensures it works without env var configuration for the user
+  if (!searchParams.has('apiKey')) {
+      searchParams.append('apiKey', process.env.NONGSARO_KEY || '202512319DLUHQN9LGWIOK5EFVGKQ');
+  }
+
   const query = searchParams.toString();
 
   const targetUrl = `http://api.nongsaro.go.kr${path}?${query}`;
