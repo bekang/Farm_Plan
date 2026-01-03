@@ -948,14 +948,10 @@ export const GarakMarketService = {
       params.append('s_pummok', normalizedQuery); // Browser will encode UTF-8. If server fails, fallback to Mock.
 
       // Determine URL based on environment
-      // 1. GitHub Pages (No Proxy) -> Use Direct URL (Requires CORS Extension)
-      // 2. Vercel / Local (Has Proxy) -> Use Proxy Path
-      const isGitHubPages = window.location.hostname.includes('github.io');
+      // Use Vercel Serverless Function (/api/garak) which acts as a robust proxy
+      // This bypasses CORS and stricter firewall rules by running on the server side
+      const baseUrl = '/api/garak';
       
-      const baseUrl = isGitHubPages
-        ? 'http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do' 
-        : '/api/garak/homepage/publicdata/dataJsonOpen.do';
-
       const response = await fetch(`${baseUrl}?${params.toString()}`);
 
       if (response.ok) {
