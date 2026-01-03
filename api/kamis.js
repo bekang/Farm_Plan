@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -14,7 +16,7 @@ export default async function handler(req, res) {
   // Target: http://www.kamis.or.kr/service/price/xml.do
   // Incoming: /api/kamis/service/price/xml.do?...
   
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  const { searchParams } = new URL(req.url, 'http://localhost');
   
   // Inject Credentials if missing (Server-side)
   // Cert Key from source code (e1649e0e-079c-40ca-acb3-aab69df21f7b)

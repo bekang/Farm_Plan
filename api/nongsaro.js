@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -27,7 +29,7 @@ export default async function handler(req, res) {
   // Better approach for single file proxy:
   // Client calls: /api/nongsaro?path=/service/varietyInfo/getVarietyList&...
   
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  const { searchParams } = new URL(req.url, 'http://localhost');
   const path = searchParams.get('path');
   
   if (!path) {

@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -10,7 +12,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  const { searchParams } = new URL(req.url, 'http://localhost');
   
   // Inject API Key (Server-side)
   // Key from user screenshot: 20259f2e18caa7a96f5e0df70a4a6fc9b121

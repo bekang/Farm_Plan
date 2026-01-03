@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -10,16 +12,8 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Construct target URL
-  // Matches: /api/weather -> http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst
-  // Note: The service currently constructs the full path. We should simplify the service or handle it here.
-  // Strategy: The service will point to /api/weather, and we append the query params.
-  // The service was using: /getUltraSrtFcst...
-  // Let's make this proxy endpoint specific to 'getUltraSrtFcst' for simplicity, or generic.
-  // Service sends: /api/public/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?...
-  
-  // Let's make the service call /api/weather?.... and we rewrite to the specific endpoint.
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  // Construct target URL safely
+  const { searchParams } = new URL(req.url, 'http://localhost');
   
   // Inject API Key (Server-side)
   // Key from user screenshot: b4d6ac2cedc8e95a0e1bdd0d0ac51aa0f5734ca9bd51501c2e9015a87cfd2325

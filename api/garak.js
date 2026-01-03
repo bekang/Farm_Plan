@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   // CORS Handling
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -13,7 +15,7 @@ export default async function handler(req, res) {
 
   // Inject Credentials (Server-side)
   // ID: 5775, PW: *suoho1004
-  const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
+  const { searchParams } = new URL(req.url, 'http://localhost');
   if (!searchParams.has('id')) {
       searchParams.append('id', process.env.GARAK_ID || '5775');
   }
