@@ -22,6 +22,7 @@ export default async function handler(req, res) {
 
   const targetUrl = `http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do?${searchParams.toString()}`;
 
+  try {
     if (typeof fetch === 'undefined') {
         throw new Error('Global fetch is not defined in this Node environment');
     }
