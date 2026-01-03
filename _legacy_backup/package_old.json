@@ -1,0 +1,26 @@
+{
+  "name": "test06",
+  "version": "1.0.0",
+  "description": "데이터 기반 영농 의사결정 지원 시스템",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bekang/Farm_Plan.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/bekang/Farm_Plan/issues"
+  },
+  "homepage": "https://github.com/bekang/Farm_Plan#readme",
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.5.0",
+    "jsdoc": "^4.0.5",
+    "mermaid": "^11.12.2"
+  }
+}

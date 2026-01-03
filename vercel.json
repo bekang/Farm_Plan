@@ -1,0 +1,32 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/nongsaro/:path*",
+      "destination": "http://api.nongsaro.go.kr/:path*"
+    },
+    {
+      "source": "/api/ncpms/:path*",
+      "destination": "https://ncpms.rda.go.kr/:path*"
+    },
+    {
+      "source": "/api/public/:path*",
+      "destination": "http://apis.data.go.kr/:path*"
+    },
+    {
+      "source": "/api/weather/:path*",
+      "destination": "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/:path*"
+    },
+    {
+      "source": "/api/kamis/:path*",
+      "destination": "http://www.kamis.or.kr/:path*"
+    },
+    {
+      "source": "/api/garak/:path*",
+      "destination": "http://www.garak.co.kr/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

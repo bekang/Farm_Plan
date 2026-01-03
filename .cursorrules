@@ -1,0 +1,15 @@
+# Project Rules for test06
+
+## 1. Language Policy (언어 정책)
+- **Primary Language**: Korean (한국어)
+- **Conversations**: 모든 대화와 설명은 반드시 **한국어**로 진행합니다.
+- **Artifacts**: `task.md`, `implementation_plan.md`, `walkthrough.md` 등 **모든** 산출물, 문서, 파일 명세, 태스크 리스트는 예외 없이 **반드시 한국어**로 작성해야 합니다. 영문 작성이 필요한 기술 용어를 제외하고는 한국어를 기본으로 합니다.
+- **Commit Messages**: 커밋 메시지는 한국어로 작성하는 것을 권장합니다 (User preference required, defaulting to logical choice based on request).
+- **Code Comments**: 주석은 한국어로 작성합니다.
+
+## 2. Interaction (상호작용)
+- 사용자가 별도로 요청하지 않아도 이 규칙은 시스템 재부팅, 새 대화 시작, 편집기 재시작 후에도 항상 유효해야 합니다.
+- 사용자의 의도를 파악하고 선제적으로 제안할 때도 한국어를 사용합니다.
+
+## 3. Context
+- 이 파일은 AI Agent가 프로젝트의 컨텍스트를 이해하고 일관된 태도를 유지하기 위한 지침서입니다.

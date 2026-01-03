@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>꿈을 그리는 농장 - ERD</title>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true });
+    </script>
+    <style>
+        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; padding: 20px; }
+        h1 { text-align: center; }
+        .mermaid { display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+    <h1>꿈을 그리는 농장 - ERD 데이터 설계도</h1>
+    <p style="text-align: center;">마우스 휠이나 브라우저 확대/축소 기능을 사용하여 자세히 확인하세요.</p>
+    <div class="mermaid">
+erDiagram
+    %% 핵심 엔티티 관계
+    USER ||--o{ FIELD : "소유 및 관리"
+    FIELD ||--o| CROP : "재배 중"
+    FIELD ||--o{ TASK : "작업 기록 보유"
+    CROP ||--o{ TASK_TEMPLATE : "표준 재배 일정 제공"
+
+    %% 사용자 엔티티 (Auth Service)
+    USER {
+        uuid id PK "사용자 고유 ID (Supabase Auth)"
+        string email "이메일 주소"
+        enum role "권한 (user | admin)"
+        json preferences "사용자 설정 (JSON)"
+        datetime created_at "가입 일시"
+    }
+
+    %% 농지 엔티티 (Farm Service / LocalStorage)
+    FIELD {
+        number id PK "식별자 (Timestamp/Auto-inc)"
+        uuid user_id FK "소유자 ID"
+        string name "농지 이름 (예: 뒷산 밭)"
+        number area "면적 (평/m2)"
+        string location "위치/주소"
+        string facility_type "시설 유형 (노지/비닐하우스 등)"
+        string crop_id FK "재배 작물 ID"
+        datetime created_at "생성 일시"
+    }
+
+    %% 작물 엔티티 (농사로 API 데이터)
+    CROP {
+        string id PK "컨텐츠 번호 (농사로 API)"
+        string name "작물명 (예: 고추)"
+        string variety "품종명"
+        string category "분류"
+    }
+
+    %% 작업 일정 엔티티 (기획 단계)
+    TASK {
+        string id PK "작업 ID"
+        number field_id FK "대상 농지 ID"
+        string content "작업 내용 (예: 물주기)"
+        datetime date "예정/수행 날짜"
+        string status "상태 (대기/완료)"
+        string type "작업 유형 (비료/농약/수확 등)"
+    }
+
+    %% 외부 API 참조 데이터
+    TASK_TEMPLATE {
+        string id PK "템플릿 ID"
+        string crop_id FK "대상 작물 ID"
+        string stage "생육 단계"
+        string work_content "추천 농작업"
+    }
+
+    %% 도매 시장 가격 (공공데이터 포털 - 도매시장 통합 웹서비스)
+    MARKET_PRICE {
+        string id PK "식별자"
+        string crop_id FK "작물 ID"
+        date date "기준 일자"
+        string market "시장명 (가락시장 등)"
+        string grade "등급 (특/상/보통)"
+        number price "가격"
+    }
+
+    %% 병해충 예측 (NCPMS - 국가농작물병해충관리시스템)
+    PEST_FORECAST {
+        string id PK "예측 식별자"
+        string crop_name "작물명"
+        string pest_name "병해충명"
+        date date "발령 일자"
+        string alert_level "경보 단계 (주의/경보)"
+        string symptom "피해 증상"
+        string control_method "방제법"
+    }
+
+    %% [사용자 입력] 토양 검정 결과 (농업기술센터 시비처방서 기준)
+    %% API 데이터와의 연동성을 위해 표준 성분명(화학식) 사용
+    SOIL_TEST_RESULT {
+        string id PK "검사 ID"
+        number field_id FK "농지 ID"
+        date test_date "검사 일자"
+        number ph "산도(pH)"
+        number om "유기물(OM)"
+        number p2o5 "유효인산(P2O5)"
+        number k "칼륨(K)"
+        number ca "칼슘(Ca)"
+        number mg "마그네슘(Mg)"
+        number ec "전기전도도(EC)"
+        number no3_n "질산태질소(NO3-N) - 선택"
+        number nh4_n "암모니아태질소(NH4-N) - 선택"
+    }
+
+    %% [사용자 입력] 수질 검사 결과 (양액재배/시비계산용 상세 분석)
+    %% 데이터 식별코드는 통상적인 화학 기호 및 Open API 표준에 맞춤
+    WATER_TEST_RESULT {
+        string id PK "검사 ID"
+        number field_id FK "농지 ID"
+        date test_date "검사 일자"
+        number ph "산도(pH)"
+        number ec "전기전도도(EC)"
+        number no3_n "질산태질소(NO3-N)"
+        number nh4_n "암모니아태질소(NH4-N)"
+        number p "인(P)"
+        number k "칼륨(K)"
+        number ca "칼슘(Ca)"
+        number mg "마그네슘(Mg)"
+        number s "황(S)"
+        number cl "염소(Cl)"
+        number na "나트륨(Na)"
+        number hco3 "중탄산(HCO3)"
+        number fe "철(Fe)"
+        number mn "망간(Mn)"
+        number b "붕소(B)"
+        number zn "아연(Zn)"
+        number cu "구리(Cu)"
+        number mo "몰리브덴(Mo)"
+    }
+    </div>
+</body>
+</html>
