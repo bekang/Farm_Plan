@@ -1,7 +1,7 @@
-import fetch from 'node-fetch';
+// Native Fetch (Node 18+) - No imports needed
 
 export default async function handler(req, res) {
-  // CORS Handling
+  // CORS setup
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -12,43 +12,38 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { searchParams } = new URL(req.url, 'http://localhost');
-  
-  // Inject API Key (Server-side)
-  // Key from user screenshot: 20259f2e18caa7a96f5e0df70a4a6fc9b121
-  if (!searchParams.has('apiKey')) {
-      searchParams.append('apiKey', process.env.PEST_KEY || '20259f2e18caa7a96f5e0df70a4a6fc9b121');
-  }
-
-  // Target: NCPMS Pest Forecast
-  // Service sends params for pestForecastList
-  const targetUrl = `https://ncpms.rda.go.kr/npmsAPI/service/pest/pestForecastList?${searchParams.toString()}`;
-
   try {
-    // node-fetch is imported, no check needed
+    const { searchParams } = new URL(req.url, 'http://localhost');
+    
+    // Inject API Key
+    if (!searchParams.has('apiKey')) {
+        searchParams.append('apiKey', process.env.PEST_KEY || '20259f2e18caa7a96f5e0df70a4a6fc9b121');
+    }
+
+    const targetUrl = `https://ncpms.rda.go.kr/npmsAPI/service/pest/pestForecastList?${searchParams.toString()}`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
 
     const response = await fetch(targetUrl, {
       method: "GET",
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-      }
+      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+      signal: controller.signal
     });
+    
+    clearTimeout(timeout);
 
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Upstream API responded with ${response.status}: ${text.substring(0, 200)}`);
-    }
+    if (!response.ok) throw new Error(`Upstream Error: ${response.status}`);
 
     const text = await response.text();
-    res.setHeader('Content-Type', 'text/xml');
-    res.status(200).send(text);
-
+    try {
+        const json = JSON.parse(text);
+        res.status(200).json(json);
+    } catch {
+        throw new Error(`Invalid JSON: ${text.substring(0, 100)}`);
+    }
   } catch (error) {
-    console.error('Pest Forecast Proxy Error:', error);
-    res.status(500).json({ 
-        error: 'Failed to fetch pest data', 
-        details: error.message,
-        debug: { targetUrl }
-    });
+    console.error('Pest Proxy Error:', error);
+    res.status(200).json({ error: 'Proxy Error', details: error.message });
   }
 }
