@@ -1,0 +1,143 @@
+# ============================================
+# Python
+# ============================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# ============================================
+# IDE & Editors
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# OS
+# ============================================
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log
+*.log.*
+
+# ============================================
+# Database
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================
+# Testing & Coverage
+# ============================================
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# ============================================
+# Type Checking & Linting
+# ============================================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pytype/
+
+# ============================================
+# Streamlit
+# ============================================
+.streamlit/secrets.toml
+
+# ============================================
+# Sensitive Data & Configuration
+# ============================================
+# API Keys and Environment Variables
+.env
+.env.local
+.env.*.local
+*.key
+config/*.env
+config/*.key
+
+# ============================================
+# Data Files (Large & Generated)
+# ============================================
+# History data (backup to NAS only)
+data/history/
+data/raw/*.csv
+data/raw/*.xlsx
+data/processed/*.pkl
+
+# Keep structure with .gitkeep
+!data/history/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# ============================================
+# Jupyter
+# ============================================
+.ipynb_checkpoints/
+*.ipynb
+
+# ============================================
+# NAS & Deployment
+# ============================================
+# NAS sync temporary files
+*.tmp
+*.bak
+.sync/
+deploy/nas_config.json
+
+# Backup archives
+*.zip
+*.tar.gz
+backups/
+
+# ============================================
+# Documentation Build
+# ============================================
+docs/_build/
+docs/.doctrees/
+site/
+
+# Custom venv fix
+venv_fix/
