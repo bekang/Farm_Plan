@@ -49,6 +49,10 @@ export default async function handler(req, res) {
   const targetUrl = `http://api.nongsaro.go.kr${path}?${query}`;
 
   try {
+    if (typeof fetch === 'undefined') {
+        throw new Error('Global fetch is not defined in this Node environment');
+    }
+
     const response = await fetch(targetUrl, {
       method: "GET",
       headers: {
@@ -57,7 +61,8 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-        throw new Error(`Upstream API responded with ${response.status}`);
+        const text = await response.text();
+        throw new Error(`Upstream API responded with ${response.status}: ${text.substring(0, 200)}`);
     }
 
     const text = await response.text();
@@ -69,7 +74,8 @@ export default async function handler(req, res) {
     console.error('Nongsaro API Proxy Error:', error);
     res.status(500).json({ 
         error: 'Failed to fetch Nongsaro data', 
-        details: error.message 
+        details: error.message,
+        debug: { targetUrl }
     });
   }
 }

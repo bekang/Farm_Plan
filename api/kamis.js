@@ -60,6 +60,10 @@ export default async function handler(req, res) {
   const targetUrl = `http://www.kamis.or.kr/service/price/xml.do?${searchParams.toString()}`;
 
   try {
+    if (typeof fetch === 'undefined') {
+        throw new Error('Global fetch is not defined in this Node environment');
+    }
+
     const response = await fetch(targetUrl, {
       method: "GET",
       headers: {
@@ -68,10 +72,11 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-        throw new Error(`Upstream API responded with ${response.status}`);
+        const text = await response.text();
+        throw new Error(`Upstream API responded with ${response.status}: ${text.substring(0, 200)}`);
     }
 
-    const data = await response.json(); // KAMIS returns JSON if p_returntype=json
+    const data = await response.json();
     res.status(200).json(data);
 
   } catch (error) {
@@ -79,7 +84,8 @@ export default async function handler(req, res) {
     // Try text if JSON fails (sometimes they return plain text error or XML despite asking for JSON)
     res.status(500).json({ 
         error: 'Failed to fetch KAMIS data', 
-        details: error.message 
+        details: error.message,
+        debug: { targetUrl }
     });
   }
 }
