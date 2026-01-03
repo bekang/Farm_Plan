@@ -1,7 +1,7 @@
-import fetch from 'node-fetch';
+// Native Fetch (Node 18+) - No imports needed
 
 export default async function handler(req, res) {
-  // CORS Handling
+  // CORS setup
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -12,55 +12,56 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Construct target URL safely
-  const { searchParams } = new URL(req.url, 'http://localhost');
-  
-  // Inject API Key (Server-side)
-  // Key from user screenshot: b4d6ac2cedc8e95a0e1bdd0d0ac51aa0f5734ca9bd51501c2e9015a87cfd2325
-  if (!searchParams.has('serviceKey')) {
-      searchParams.append('serviceKey', process.env.WEATHER_KEY || 'b4d6ac2cedc8e95a0e1bdd0d0ac51aa0f5734ca9bd51501c2e9015a87cfd2325');
-  }
-  
-  // Decoding the key if it's already encoded can be tricky, but usually these keys are passed as is or URI encoded.
-  // The Public Data Portal key often contains special chars like /, +, =. 
-  // The screenshot key looks alphanumeric (hex-like), so it might not need encoding. 
-  // 'b4d6...' is purely hex, so it's safe.
-  
-  const targetUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${searchParams.toString()}`;
-
   try {
-    // node-fetch is imported, no check needed
+    // 1. Safe URL Parsing
+    const { searchParams } = new URL(req.url, 'http://localhost');
+    
+    // 2. Inject Key
+    if (!searchParams.has('serviceKey')) {
+        searchParams.append('serviceKey', process.env.WEATHER_KEY || 'b4d6ac2cedc8e95a0e1bdd0d0ac51aa0f5734ca9bd51501c2e9015a87cfd2325');
+    }
+
+    const targetUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${searchParams.toString()}`;
+
+    // 3. Fetch with Timeout limit (5 seconds) to prevent Vercel 504/500 crash
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
 
     const response = await fetch(targetUrl, {
-      method: "GET",
+      method: 'GET',
       headers: {
         "Accept": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-      }
+      },
+      signal: controller.signal
     });
+    
+    clearTimeout(timeout);
 
     if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Upstream API responded with ${response.status}: ${text.substring(0, 200)}`);
+        throw new Error(`Upstream Error: ${response.status} ${response.statusText}`);
     }
-    
-    // KMA API often returns JSON inside a 'response' object, but check content-type
+
     const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        res.status(200).json(data);
-    } else {
-        // Sometimes KMA returns XML even if JSON is requested if there's an error
-        const text = await response.text();
-        throw new Error(`Expected JSON but got ${contentType}: ${text.substring(0, 200)}`);
+    const text = await response.text();
+
+    try {
+        const json = JSON.parse(text);
+        res.status(200).json(json);
+    } catch (e) {
+        // XML or HTML response
+        throw new Error(`Invalid JSON response: ${text.substring(0, 100)}...`);
     }
 
   } catch (error) {
-    console.error('Weather API Proxy Error:', error);
-    res.status(500).json({ 
-        error: 'Failed to fetch weather data', 
-        details: error.message,
-        debug: { targetUrl } 
+    console.error('Weather Proxy Error:', error);
+    // Return 200 with error info so Client handles it cleanly instead of 500
+    res.status(200).json({
+      response: {
+        header: { resultCode: '99', resultMsg: `PROXY_ERROR: ${error.message}` }
+      },
+      error: true,
+      details: error.message
     });
   }
 }
