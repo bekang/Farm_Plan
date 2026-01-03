@@ -13,7 +13,8 @@ export const PestService = {
     try {
       // NCPMS API - Month Forecast
       // Use Vercel Serverless Function
-      const url = `/api/pest?apiKey=${API_KEY}&serviceCode=SVC01&serviceType=AA001`;
+      // Use Vercel Serverless Function (Key injected server-side)
+      const url = `/api/pest?serviceCode=SVC01&serviceType=AA001`;
 
       const response = await fetch(url);
       if (!response.ok) return [];

@@ -21,7 +21,17 @@ export default async function handler(req, res) {
   // Let's make the service call /api/weather?.... and we rewrite to the specific endpoint.
   const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
   
-  // Hardcoding the endpoint for safety and simplicity as per current usage
+  // Inject API Key (Server-side)
+  // Key from user screenshot: b4d6ac2cedc8e95a0e1bdd0d0ac51aa0f5734ca9bd51501c2e9015a87cfd2325
+  if (!searchParams.has('serviceKey')) {
+      searchParams.append('serviceKey', process.env.WEATHER_KEY || 'b4d6ac2cedc8e95a0e1bdd0d0ac51aa0f5734ca9bd51501c2e9015a87cfd2325');
+  }
+  
+  // Decoding the key if it's already encoded can be tricky, but usually these keys are passed as is or URI encoded.
+  // The Public Data Portal key often contains special chars like /, +, =. 
+  // The screenshot key looks alphanumeric (hex-like), so it might not need encoding. 
+  // 'b4d6...' is purely hex, so it's safe.
+  
   const targetUrl = `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${searchParams.toString()}`;
 
   try {

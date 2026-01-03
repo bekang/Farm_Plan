@@ -12,6 +12,12 @@ export default async function handler(req, res) {
 
   const { searchParams } = new URL(req.url, `http://${req.headers.host}`);
   
+  // Inject API Key (Server-side)
+  // Key from user screenshot: 20259f2e18caa7a96f5e0df70a4a6fc9b121
+  if (!searchParams.has('apiKey')) {
+      searchParams.append('apiKey', process.env.PEST_KEY || '20259f2e18caa7a96f5e0df70a4a6fc9b121');
+  }
+
   // Target: NCPMS Pest Forecast
   // Service sends params for pestForecastList
   const targetUrl = `https://ncpms.rda.go.kr/npmsAPI/service/pest/pestForecastList?${searchParams.toString()}`;

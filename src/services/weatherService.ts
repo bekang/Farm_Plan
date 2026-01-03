@@ -37,10 +37,8 @@ export const WeatherService = {
     const baseTime = `${hours.toString().padStart(2, '0')}30`;
 
     try {
-      if (!API_KEY) throw new Error("No API Key");
-
-      // Use Vercel Serverless Function
-      const url = `/api/weather?serviceKey=${API_KEY}&pageNo=1&numOfRows=60&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
+      // Use Vercel Serverless Function (Key injected server-side)
+      const url = `/api/weather?pageNo=1&numOfRows=60&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not ok');
