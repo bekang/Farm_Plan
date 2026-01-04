@@ -11,35 +11,14 @@ export interface PestAlert {
 export const PestService = {
   async getPestAlerts(): Promise<PestAlert[]> {
     try {
-      // NCPMS API - Month Forecast
-      // Use Vercel Serverless Function
-      // Use Vercel Serverless Function (Key injected server-side)
-      const url = `/api/pest?serviceCode=SVC01&serviceType=AA001`;
-
-      const response = await fetch(url);
+      // NAS Caching Strategy
+      const response = await fetch(`/data/ncpms/pest_alert.json?t=${new Date().getTime()}`);
       if (!response.ok) return [];
 
-      const text = await response.text();
-      // Only parse if XML (NCPMS usually returns XML)
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(text, 'text/xml');
-
-      const pests: PestAlert[] = [];
-      const items = xmlDoc.getElementsByTagName('item');
-
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        pests.push({
-          pestName: item.getElementsByTagName('pestName')[0]?.textContent || '',
-          cropName: item.getElementsByTagName('cropName')[0]?.textContent || '',
-          alertLevel: item.getElementsByTagName('forecastLevel')[0]?.textContent || '',
-          forecastDate: item.getElementsByTagName('forecastDate')[0]?.textContent || '',
-        });
-      }
-
-      return pests.slice(0, 5); // Return top 5
+      const json = await response.json();
+      return json.data || [];
     } catch (error) {
-      console.error('Failed to fetch pest config:', error);
+      console.warn('Failed to fetch pest data from NAS:', error);
       return [];
     }
   },

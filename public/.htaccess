@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # React Router Support
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Note: ipTIME NAS or standard shared hosting often DISABLES mod_proxy for security.
+# If the lines below cause "500 Internal Server Error", it means Proxy is not allowed.
+# In that case, we MUST use a public CORS proxy or a different backend.
+
+# PHP Proxy Fallback (Since mod_proxy usually fails on NAS)
+<IfModule mod_rewrite.c>
+  # Retrieve /api/service/endpoint...
+  # Rewrite to proxy.php?path=service/endpoint...
+  
+  RewriteCond %{REQUEST_URI} ^/api/(.*)$
+  RewriteRule ^api/(.*)$ proxy.php?path=$1 [QSA,L]
+</IfModule>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합 API 기술 매뉴얼</title>
+    <style>
+        body { font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 40px 20px; word-break: keep-all; }
+        h1 { border-bottom: 2px solid #222; padding-bottom: 0.5em; margin-bottom: 30px; font-size: 2.2em; font-weight: 800; }
+        h2 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 40px; color: #111; font-weight: 700; }
+        h3 { margin-top: 30px; color: #444; font-size: 1.25em; border-left: 4px solid #007bff; padding-left: 10px; }
+        code { background-color: #f0f0f0; padding: 0.2em 0.4em; border-radius: 3px; font-family: "D2Coding", Consolas, Monaco, monospace; font-size: 85%; color: #c7254e; }
+        pre { background-color: #f6f8fa; padding: 16px; overflow: auto; border-radius: 6px; border: 1px solid #e1e4e8; }
+        pre code { background-color: transparent; color: #24292e; padding: 0; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+        th, td { border: 1px solid #dfe2e5; padding: 8px 12px; }
+        th { background-color: #f8f9fa; font-weight: 600; text-align: left; }
+        .badge { display: inline-block; padding: 0.25em 0.4em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; color: #fff; background-color: #28a745; }
+        .note { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 4px; border-left: 5px solid #ffeeba; margin: 20px 0; }
+        .toc { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 40px; }
+        .toc ul { list-style: none; padding-left: 0; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { text-decoration: none; color: #0366d6; font-weight: 500; }
+        .toc a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>통합 API 기술 매뉴얼 v1.0</h1>
+    <p>본 문서는 스마트 영농 관리 대시보드에 연동된 <strong>모든 외부 API 서비스에 대한 기술 가이드</strong>입니다. 각 서비스의 필수 파라미터, 데이터 구조, 호출 시 주의사항을 상세히 다룹니다.</p>
+
+    <div class="toc">
+        <h3>목차</h3>
+        <ul>
+            <li><a href="#section-1">1. 농사로 (농촌진흥청)</a></li>
+            <li><a href="#section-2">2. 공공데이터포털 (기상청, 농진청)</a></li>
+            <li><a href="#section-3">3. KAMIS (농산물 유통정보)</a></li>
+            <li><a href="#section-4">4. 가락시장 (서울시농수산식품공사)</a></li>
+            <li><a href="#section-5">5. 개발 가이드라인 (Troubleshooting)</a></li>
+        </ul>
+    </div>
+
+    <h2 id="section-1">1. 농사로 (Rural Development Administration)</h2>
+    <p><strong>공통 사항</strong>: 대부분의 서비스가 <code>apiKey</code>를 필수로 요구하며, 선택적으로 <code>serviceType</code>(XML/JSON)을 지원합니다.</p>
+    <ul>
+        <li><strong>Base URL</strong>: <code>http://api.nongsaro.go.kr/service</code></li>
+    </ul>
+
+    <h3>A. 품종 정보 (Variety Information)</h3>
+    <ul>
+        <li><strong>엔드포인트</strong>: <code>/varietyInfo/varietyList</code> (목록), <code>/varietyInfo/varietyInfo</code> (상세)</li>
+        <li><strong>주요 파라미터</strong>:
+            <ul>
+                <li><code>sVarietyNm</code>: 품종명 검색 (예: '고추', '아리수' - URL 인코딩 필요)</li>
+                <li><code>sCropNm</code>: 작물명 검색</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>B. 병해충 검색 (Pest/Disease Search)</h3>
+    <ul>
+        <li><strong>엔드포인트</strong>: <code>/sicknsInfoList/sicknsInfoList</code></li>
+        <li><strong>주요 파라미터</strong>:
+            <ul>
+                <li><code>sicknsNm</code>: 병해충명 (정확한 명칭 필요, 예: '탄저병')</li>
+                <li><code>cropNm</code>: 작물명 (예: '사과')</li>
+            </ul>
+        </li>
+        <li><strong>주의</strong>: 검색어가 정확하지 않으면 결과가 나오지 않을 수 있습니다.</li>
+    </ul>
+
+    <h2 id="section-2">2. 공공데이터포털 (Data.go.kr)</h2>
+
+    <h3>A. 토양환경정보 (Soil Environment)</h3>
+    <ul>
+        <li><strong>서비스 경로</strong>: <code>/SoilEnviron/SoilExam/V2</code></li>
+        <li><strong>주요 파라미터</strong>:
+            <ul>
+                <li><code>PNU_Code</code> (권장): 19자리 표준 필지(지번) 코드. 가장 정확도가 높음.</li>
+                <li><code>STDG_CD</code>: 10자리 법정동 코드. 범위가 넓어 특정 농장 분석에는 부적합할 수 있음.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>B. 기상청 단기예보 (Village Forecast)</h3>
+    <ul>
+        <li><strong>서비스 경로</strong>: <code>/1360000/VilageFcstInfoService_2.0/getVilageFcst</code></li>
+        <li><strong>필수 파라미터</strong>:
+            <ul>
+                <li><code>base_date</code>: 발표 일자 (YYYYMMDD)</li>
+                <li><code>base_time</code>: 발표 시각 (0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300)</li>
+                <li><code>nx</code>, <code>ny</code>: 기상청 전용 격자 좌표 (위경도 아님)</li>
+            </ul>
+        </li>
+        <li><strong>주의사항</strong>: 현재 시각보다 <strong>이전의 Base Time</strong>을 요청해야 데이터가 옵니다. (예: 08:00에 0800 데이터를 요청하면 에러 발생 가능, 0500 요청 권장)</li>
+    </ul>
+
+    <h2 id="section-3">3. KAMIS (농수산식품유통공사)</h2>
+
+    <h3>일일 도소매 가격 정보</h3>
+    <ul>
+        <li><strong>Base URL</strong>: <code>http://www.kamis.or.kr/service/price/xml.do</code></li>
+        <li><strong>필수 파라미터</strong>:
+            <ul>
+                <li><code>p_cert_key</code>: API 인증키</li>
+                <li><code>p_cert_id</code>: 승인 ID</li>
+                <li><code>p_regday</code>: 조회 날짜 (YYYY-MM-DD 형식)</li>
+            </ul>
+        </li>
+        <li><strong>응답 데이터 예시</strong>:
+<pre><code>{
+    "data": {
+        "item": [
+            {
+                "item_name": "사과",
+                "rank": "중품",
+                "price": "5,000"
+            }
+        ]
+    }
+}</code></pre>
+        </li>
+        <li class="note"><strong>트러블슈팅</strong>: 주말이나 공휴일에 요청하면 <code>OpenAPI Error</code> 또는 빈 데이터가 반환됩니다. 반드시 평일 날짜로 요청하세요.</li>
+    </ul>
+
+    <h2 id="section-4">4. 가락시장 (서울시농수산식품공사)</h2>
+
+    <h3>전자경매 낙찰 정보</h3>
+    <ul>
+        <li><strong>엔드포인트</strong>: <code>/homepage/publicdata/dataJsonOpen.do</code></li>
+        <li><strong>파라미터</strong>:
+            <ul>
+                <li><code>id</code>: <code>5775</code> (고정 ID)</li>
+                <li><code>dataid</code>: <code>data36</code> (경매 데이터 ID)</li>
+                <li><code>s_date</code>: 조회 날짜 (YYYYMMDD)</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2 id="section-5">5. 개발 가이드라인</h2>
+    <ol>
+        <li><strong>CORS 프록시</strong>: 브라우저에서 직접 공공기관 API를 호출하면 CORS 보안 정책에 막힐 수 있습니다. 반드시 백엔드 프록시를 거치거나 테스트용 확장 프로그램을 사용하세요.</li>
+        <li><strong>날짜 포맷 혼동 주의</strong>: KAMIS는 <code>YYYY-MM-DD</code>(하이픈 포함)를 쓰고, 나머지 기관은 대부분 <code>YYYYMMDD</code>(하이픈 없음)를 사용합니다.</li>
+        <li><strong>인코딩 이슈</strong>: 공공데이터포털 키는 이미 인코딩된 상태로 제공됩니다. 이를 다시 인코딩(Double Encoding)하면 인증 에러가 발생하므로 주의하세요.</li>
+    </ol>
+</body>
+</html>

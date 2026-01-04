@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>농사로(Nongsaro) 통합 API 매뉴얼</title>
+    <style>
+        body { font-family: "Pretendard", sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { border-bottom: 2px solid #28a745; padding-bottom: 0.3em; margin-top: 24px; color: #155724; }
+        .common-box { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 4px; border: 1px solid #c3e6cb; margin-bottom: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+        th, td { border: 1px solid #dfe2e5; padding: 8px; text-align: left; }
+        th { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <h1>농사로(Nongsaro) 통합 API 가이드</h1>
+    <p><strong>출처</strong>: 농촌진흥청 농사로</p>
+
+    <div class="common-box">
+        <h3>💡 공통 패턴 (Common Pattern)</h3>
+        <p>농사로의 대부분 API(30여 종)는 아래 공통 파라미터 구조를 따릅니다.</p>
+        <ul>
+            <li><strong>기본 URL</strong>: <code>http://api.nongsaro.go.kr/service/{서비스ID}</code></li>
+            <li><strong>필수 파라미터</strong>: <code>apiKey</code> (발급받은 키)</li>
+            <li><strong>옵션 파라미터</strong>: <code>serviceType</code> (XML/JSON, 기본값 XML)</li>
+            <li><strong>페이징</strong>: <code>pageNo</code>, <code>numOfRows</code></li>
+        </ul>
+    </div>
+
+    <h2>주요 서비스별 엔드포인트 및 설명</h2>
+    <p>아래 서비스들은 모두 <strong>공통 패턴</strong>(apiKey 필수)을 따릅니다.</p>
+    <table>
+        <thead>
+            <tr><th>서비스명</th><th>엔드포인트</th><th>설명</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>병해충 검색</td><td><code>/sicknsInfoList</code></td><td>병해충 도감 검색 및 상세정보</td></tr>
+            <tr><td>농기계 구입정보</td><td><code>/farmMachinery</code></td><td>가격 및 판매처 정보</td></tr>
+            <tr><td>주간농사정보</td><td><code>/weekFarmInfo</code></td><td>주간 단위 농사 정보 (PDF 등)</td></tr>
+            <tr><td>품종정보</td><td><code>/varietyInfo</code></td><td>(별도 상세 매뉴얼 참조)</td></tr>
+            <tr><td>관련 사이트 정보</td><td><code>/siteInfo</code></td><td>농업 유관 기관 사이트 목록</td></tr>
+            <tr><td>국내외 연구동향</td><td><code>/researchTrend</code></td><td>최신 농업 연구 논문/동향</td></tr>
+            <tr><td>내재해형 시설규격</td><td><code>/disasterSpec</code></td><td>비닐하우스 등 시설 규격</td></tr>
+            <tr><td>농약 등록/판매</td><td><code>/pesticide</code> 관련</td><td>품질검사, 등록현황, 판매가격 등</td></tr>
+            <tr><td>비료 품질검사</td><td><code>/fertilizer</code> 관련</td><td>비료 품질 검사 현황</td></tr>
+            <tr><td>이달의 농업기술</td><td><code>/monthFarmTech</code></td><td>월별 추천 농업 기술</td></tr>
+            <tr><td>지역특산물</td><td><code>/localSpecialty</code></td><td>지역별 대표 특산물 정보</td></tr>
+            <tr><td>치유농업</td><td><code>/healingAgri</code></td><td>치유농업 관련 교육/체험 정보</td></tr>
+            <!-- 기타 20여종 서비스 포함 -->
+        </tbody>
+    </table>
+
+    <div class="common-box">
+        <strong>참고:</strong> 위 목록에 없는 서비스도 <code>http://api.nongsaro.go.kr/service/{서비스ID}</code> 형태로 호출 가능하며, 파라미터는 <code>apiKey</code>가 기본입니다.
+    </div>
+
+    <h2>호출 예시</h2>
+    <p><code>GET http://api.nongsaro.go.kr/service/weekFarmInfo/weekFarmInfoList?apiKey={KEY}&year=2024</code></p>
+</body>
+</html>

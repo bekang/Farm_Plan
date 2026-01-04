@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { AlertCircle, CheckCircle2, Search, Calendar as CalendarIcon, Calculator } from 'lucide-react';
-import { useSearchCrops } from '@/hooks/useMarketCrops';
+import { useSearchCrops, useHistoricalPrice, useMarketOptions, useUnitOptions, useCropPrediction } from '@/hooks/useMarketCrops';
 import { SimpleCalendar } from './SimpleCalendar';
 import { FinancialCalculatorModal } from './FinancialCalculatorModal';
 import { planFormSchema, type PlanFormValues } from '@/schemas/planningSchema';
@@ -75,49 +75,92 @@ export function SinglePagePlanForm({
   // Search Data
   const { data: searchResults = [] } = useSearchCrops(searchQuery);
 
+  // Market & Unit Options
+  const { data: marketOptions = [] } = useMarketOptions(selectedMarketCrop?.name || '');
+  const { data: unitOptions = [] } = useUnitOptions(selectedMarketCrop?.name || '');
+  
+  // Selection State
+  const [selectedMarket, setSelectedMarket] = useState<string>('');
+  const [selectedUnit, setSelectedUnit] = useState<string>('');
+
+  // Price Prediction Data (Async)
+  // Use estimatedHarvestDate for prediction
+  const harvestDateForPred = watchedValues.estimatedHarvestDate;
+  const { data: predictedData } = useCropPrediction(
+      selectedMarketCrop?.name || '', 
+      selectedMarket, 
+      selectedUnit, 
+      harvestDateForPred || ''
+  );
+
   // Handlers
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     if (!e.target.value) {
         setSelectedMarketCrop(null);
+        setSelectedMarket('');
+        setSelectedUnit('');
     }
   };
 
   const handleSelectCrop = (crop: MarketCrop) => {
     setSelectedMarketCrop(crop);
     setValue('cropName', crop.name);
-    setSearchQuery(crop.name); // Set input to name
-    
-    // Generate Prediction
-    const info = CULTIVATION_KB[crop.name] || CULTIVATION_KB.default;
-    const today = new Date();
-    const harvestDate = new Date(today);
-    const duration = info.sortingDuration || (info.seedingDuration + info.transplantDuration); // Approximate
-    harvestDate.setDate(today.getDate() + duration);
-
-    // Mock Financials
-    const area = 300; // Mock 300 pyung
-    const yieldPerArea = 10; // kg
-    const estYield = area * yieldPerArea;
-    const estPrice = crop.defaultPrice || 5000;
-    const revenue = estYield * estPrice;
-    
-    const cost = info.defaultMethod === 'transplanting' ? info.transplantCost : info.seedingCost;
-
-    setPrediction({
-        duration,
-        harvestDate: harvestDate.toISOString().split('T')[0],
-        revenue,
-        cost,
-        yield: estYield
-    });
-
-    // Set Default Values
-    setValue('estimatedHarvestDate', harvestDate.toISOString().split('T')[0]);
-    setValue('estimatedCost', cost);
-    setValue('targetYield', estYield);
-    setValue('targetPrice', estPrice);
+    setSearchQuery(crop.name); 
+    // Defaults will be set when options load, or we can set them here if available in crop
+    if (crop.standardUnit) setSelectedUnit(crop.standardUnit);
   };
+  
+  // Auto-select first market/unit if available and not set
+  useEffect(() => {
+      if (marketOptions.length > 0 && !selectedMarket) setSelectedMarket(marketOptions[0]);
+  }, [marketOptions, selectedMarket]);
+  
+  useEffect(() => {
+      if (unitOptions.length > 0 && !selectedUnit) setSelectedUnit(unitOptions[0]);
+  }, [unitOptions, selectedUnit]);
+
+  // Effect: Calculate Prediction when Data is Ready
+  useEffect(() => {
+    if (selectedMarketCrop && watchedValues.plantingDate) {
+        const info = CULTIVATION_KB[selectedMarketCrop.name] || CULTIVATION_KB.default;
+        const start = new Date(watchedValues.plantingDate);
+        const duration = info.sortingDuration || (info.seedingDuration + info.transplantDuration); // This might need fix if KB is not used? 
+        // Actually we should use crop.growingDays if available from service, but here we use KB or fallback.
+        // Let's rely on info from crop object if we had it, but for now KB is fine.
+        
+        const harvestDate = new Date(start);
+        harvestDate.setDate(harvestDate.getDate() + duration);
+        const harvestDateStr = harvestDate.toISOString().split('T')[0];
+
+        // Financials
+        const area = 300; // Mock 300 pyung
+        const yieldPerArea = 10; // kg
+        const estYield = area * yieldPerArea;
+        
+        // Use Predicted Price if available, else standard default
+        const unitPrice = predictedData?.price || selectedMarketCrop.defaultPrice || 5000;
+        
+        const revenue = estYield * unitPrice;
+        const cost = info.defaultMethod === 'transplanting' ? info.transplantCost : info.seedingCost;
+
+        setPrediction({
+            duration,
+            harvestDate: harvestDateStr,
+            revenue,
+            cost,
+            yield: estYield,
+            isHistorical: !!predictedData?.price, // Flag to show source
+            priceSource: predictedData?.price ? '평년 예측가' : '최근 도매가'
+        });
+
+        // Form Update
+        setValue('estimatedHarvestDate', harvestDateStr);
+        setValue('estimatedCost', cost);
+        setValue('targetYield', estYield);
+        setValue('targetPrice', unitPrice);
+    }
+  }, [selectedMarketCrop, watchedValues.plantingDate, predictedData, setValue]);
 
   // Effect: Calculate Soil Prep Dates
   useEffect(() => {
@@ -192,7 +235,10 @@ export function SinglePagePlanForm({
                  <Label>작물 선택</Label>
                  {selectedMarketCrop ? (
                     <div className="flex items-center justify-between rounded-lg border-2 border-indigo-100 bg-indigo-50 p-3">
-                       <span className="font-bold text-indigo-700">{selectedMarketCrop.name}</span>
+                       <div className="flex flex-col">
+                           <span className="font-bold text-indigo-700">{selectedMarketCrop.name}</span>
+                           <span className="text-xs text-slate-500">거래 단위: {selectedMarketCrop.standardUnit || 'kg'}</span>
+                       </div>
                        <Button variant="ghost" size="sm" onClick={() => setSelectedMarketCrop(null)} className="h-6 text-xs text-indigo-400">변경</Button>
                     </div>
                  ) : (
@@ -372,6 +418,11 @@ export function SinglePagePlanForm({
                         <div className="mt-2 border-t pt-2 text-right font-bold text-green-700">
                            + {(prediction.revenue - prediction.cost).toLocaleString()}원
                         </div>
+                        {selectedMarketCrop.defaultPrice && selectedMarketCrop.defaultPrice > 0 && (
+                            <div className="mt-1 text-right text-[10px] text-blue-500">
+                                * 가락시장 실시간 도매가 적용됨
+                            </div>
+                        )}
                         
                         {/* New Detail Button */}
                         <div className="mt-3">

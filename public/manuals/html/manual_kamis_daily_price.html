@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAMIS 일일 도소매 가격 API 매뉴얼</title>
+    <style>
+        body { font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 24px; color: #111; }
+        code { background-color: #f6f8fa; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; color: #d63384; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+        th, td { border: 1px solid #dfe2e5; padding: 8px 12px; }
+        th { background-color: #f8f9fa; text-align: left; }
+        .badge { background-color: #28a745; color: #fff; padding: 0.2em 0.5em; border-radius: 4px; font-size: 0.8em; }
+        .alert { padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #856404; background-color: #fff3cd; border-left: 5px solid #ffeeba; }
+    </style>
+</head>
+<body>
+    <h1>KAMIS 일일 도소매 가격정보 매뉴얼</h1>
+    <p>
+        <strong>서비스명</strong>: 일일 도소매 가격 정보 (Daily Price)<br>
+        <strong>출처</strong>: aT 한국농수산식품유통공사<br>
+        <span class="badge">검증 완료</span>
+    </p>
+
+    <h2>1. 개요</h2>
+    <p>주요 농축수산물의 일별 도매 및 소매 가격 정보를 제공합니다. (Open API)</p>
+
+    <h2>2. API 엔드포인트</h2>
+    <ul>
+        <li><strong>XML 방식</strong>: <code>http://www.kamis.or.kr/service/price/xml.do</code></li>
+        <li><strong>JSON 방식</strong>: <code>http://www.kamis.or.kr/service/price/json.do</code></li>
+    </ul>
+
+    <h2>3. 요청 파라미터 (필수)</h2>
+    <table>
+        <thead>
+            <tr><th>파라미터</th><th>필수 여부</th><th>설명</th><th>비고</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>p_cert_key</code></td><td><strong>Yes</strong></td><td>인증키 (API Key)</td><td>가입 시 발급</td></tr>
+            <tr><td><code>p_cert_id</code></td><td><strong>Yes</strong></td><td>요청자 ID</td><td>예: <code>7036</code> 등</td></tr>
+            <tr><td><code>p_returntype</code></td><td>No</td><td>응답 포맷</td><td><code>json</code> 또는 <code>xml</code></td></tr>
+            <tr><td><code>p_regday</code></td><td><strong>Yes</strong></td><td>조회 날짜</td><td>YYYY-MM-DD 형식</td></tr>
+            <tr><td><code>p_item_category_code</code></td><td>No</td><td>부류 코드</td><td>100(식량), 200(채소) 등</td></tr>
+        </tbody>
+    </table>
+
+    <div class="alert">
+        <strong>⚠️ 개발 시 주의사항:</strong>
+        <ul>
+            <li><strong>콤마(,) 제거 필수</strong>: 가격 데이터가 "1,500" 처럼 콤마가 포함된 문자열로 옴. 숫자 계산 전 반드시 콤마를 제거(Replace)해야 함.</li>
+            <li><strong>단일 일자 조회</strong>: 하루치 데이터만 조회 가능. 기간 조회 시 날짜를 반복(Loop)해서 호출해야 함.</li>
+            <li><strong>휴일 데이터 없음</strong>: 주말 및 공휴일에는 데이터가 없거나 <code>001</code> 코드가 반환됨.</li>
+        </ul>
+    </div>
+</body>
+</html>

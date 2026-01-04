@@ -1,0 +1,170 @@
+[
+  {
+    "name": "쪽파",
+    "growingDays": 45,
+    "description": "파종 후 40~50일 수확",
+    "stdUnit": "10kg 상자",
+    "defaultYield": 3000
+  },
+  {
+    "name": "대파",
+    "growingDays": 90,
+    "description": "정식 후 3개월",
+    "stdUnit": "1kg 단",
+    "defaultYield": 5000
+  },
+  {
+    "name": "배추",
+    "growingDays": 70,
+    "description": "일반적인 배추 (60~80일)",
+    "stdUnit": "10kg 망",
+    "defaultYield": 10000
+  },
+  {
+    "name": "배추(봄)",
+    "growingDays": 70,
+    "description": "봄배추",
+    "stdUnit": "10kg 망",
+    "defaultYield": 10000
+  },
+  {
+    "name": "배추(가을)",
+    "growingDays": 80,
+    "description": "김장배추",
+    "stdUnit": "10kg 망",
+    "defaultYield": 12000
+  },
+  {
+    "name": "무",
+    "growingDays": 70,
+    "description": "일반 무",
+    "stdUnit": "20kg 상자",
+    "defaultYield": 8000
+  },
+  {
+    "name": "무(봄)",
+    "growingDays": 60,
+    "description": "봄무",
+    "stdUnit": "20kg 상자",
+    "defaultYield": 8000
+  },
+  {
+    "name": "무(가을)",
+    "growingDays": 70,
+    "description": "김장무",
+    "stdUnit": "20kg 상자",
+    "defaultYield": 10000
+  },
+  {
+    "name": "감자",
+    "growingDays": 90,
+    "description": "봄감자 기준",
+    "stdUnit": "20kg 상자",
+    "defaultYield": 6000
+  },
+  {
+    "name": "감자(수미)",
+    "growingDays": 90,
+    "description": "수미감자",
+    "stdUnit": "20kg 상자",
+    "defaultYield": 6000
+  },
+  {
+    "name": "감자(대서)",
+    "growingDays": 95,
+    "description": "가공용",
+    "stdUnit": "20kg 상자",
+    "defaultYield": 6500
+  },
+  {
+    "name": "고구마",
+    "growingDays": 120,
+    "description": "정식 후 110~130일",
+    "stdUnit": "10kg 상자",
+    "defaultYield": 5000
+  },
+  {
+    "name": "고구마(밤)",
+    "growingDays": 120,
+    "description": "밤고구마",
+    "stdUnit": "10kg 상자",
+    "defaultYield": 5000
+  },
+  {
+    "name": "고구마(호박)",
+    "growingDays": 130,
+    "description": "호박고구마 (만생종)",
+    "stdUnit": "10kg 상자",
+    "defaultYield": 5500
+  },
+  {
+    "name": "양파",
+    "growingDays": 240,
+    "description": "가을 파종, 이듬해 수확 (월동)",
+    "stdUnit": "20kg 망",
+    "defaultYield": 8000
+  },
+  {
+    "name": "마늘",
+    "growingDays": 240,
+    "description": "가을 파종, 이듬해 수확 (월동)",
+    "stdUnit": "10kg 망",
+    "defaultYield": 4000
+  },
+  {
+    "name": "고추(건)",
+    "growingDays": 150,
+    "description": "노지 고추",
+    "stdUnit": "30kg",
+    "defaultYield": 3000
+  },
+  {
+    "name": "고추(청양)",
+    "growingDays": 120,
+    "description": "풋고추 수확",
+    "stdUnit": "10kg 상자",
+    "defaultYield": 4000
+  },
+  {
+    "name": "오이",
+    "growingDays": 60,
+    "description": "정식 후 수확 시작",
+    "stdUnit": "50개 상자",
+    "defaultYield": 20000
+  },
+  {
+    "name": "토마토",
+    "growingDays": 90,
+    "description": "정식 후 수확 시작",
+    "stdUnit": "5kg 상자",
+    "defaultYield": 15000
+  },
+  {
+    "name": "딸기",
+    "growingDays": 180,
+    "description": "정식 후 수확 기간 포함",
+    "stdUnit": "2kg",
+    "defaultYield": 3000
+  },
+  {
+    "name": "상추",
+    "growingDays": 40,
+    "description": "정식 후 30~40일",
+    "stdUnit": "4kg 상자",
+    "defaultYield": 3000
+  },
+  {
+    "name": "깻잎",
+    "growingDays": 50,
+    "description": "정식 후 40~50일",
+    "stdUnit": "100속",
+    "defaultYield": 2000
+  },
+  {
+    "name": "미나리",
+    "growingDays": 50,
+    "description": "물미나리 기준",
+    "stdUnit": "10kg",
+    "defaultYield": 4000
+  }
+]

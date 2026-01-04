@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 import { RootLayout } from './components/layout/RootLayout';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
@@ -9,13 +9,10 @@ import { Settings } from 'lucide-react';
 const FieldDashboard = React.lazy(() =>
   import('./components/farm/FieldDashboard').then((module) => ({ default: module.FieldDashboard })),
 );
-const RevenueCalculator = React.lazy(() =>
-  import('./components/simulation/RevenueCalculator').then((module) => ({
-    default: module.RevenueCalculator,
-  })),
-);
+
 import { Dashboard } from './pages/Dashboard';
-import { LoginPage } from './pages/LoginPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import { OnboardingPage } from './pages/auth/OnboardingPage';
 import { FinancialLedgerPage } from './pages/FinancialLedgerPage';
 import { FinancialReportPage } from './pages/FinancialReportPage';
 import { ConsultingReportPage } from './pages/ConsultingReportPage';
@@ -24,7 +21,15 @@ import ConsultingEvidencePage from './pages/ConsultingEvidencePage';
 import { FarmRegistrationPage } from './pages/FarmRegistrationPage';
 import { CropPlanningPage } from './pages/CropPlanningPage';
 import { CropPlanningDetail } from './pages/CropPlanningDetail';
-import TimelinePlayground from './pages/TimelinePlayground';
+
+import { AdminDashboard } from './pages/AdminDashboard';
+import { PageManager } from './pages/admin/PageManager';
+import { SystemDocumentation } from './pages/admin/SystemDocumentation';
+import { ApiManager } from './pages/admin/ApiManager';
+import { UserManager } from './pages/admin/UserManager';
+import { ProgramTableManager } from './pages/admin/ProgramTableManager';
+import { ProgramStructureViewer } from './pages/admin/ProgramStructureViewer';
+import { CoverPage } from './pages/CoverPage';
 
 // Text Loader
 const PageLoader = () => (
@@ -35,22 +40,12 @@ const PageLoader = () => (
 );
 
 function App() {
-  console.log('[App] v2.1 Application Loaded');
   return (
-    <Router basename={import.meta.env.BASE_URL}>
+    <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<CoverPage />} />
         <Route path="/login" element={<LoginPage />} />
-
-        {/* Playground Routes */}
-        <Route
-            path="/playground/timeline"
-            element={
-              <ErrorBoundary>
-                <TimelinePlayground />
-              </ErrorBoundary>
-            }
-          />
+        <Route path="/onboarding" element={<OnboardingPage />} />
 
         {/* Wrap all routes in RootLayout */}
         <Route path="/dashboard" element={<RootLayout />}>
@@ -109,17 +104,6 @@ function App() {
           />
 
           <Route
-            path="revenue-calc"
-            element={
-              <ErrorBoundary>
-                <Suspense fallback={<PageLoader />}>
-                  <RevenueCalculator />
-                </Suspense>
-              </ErrorBoundary>
-            }
-          />
-
-          <Route
             path="farm-registration"
             element={
               <ErrorBoundary>
@@ -157,18 +141,13 @@ function App() {
             }
           />
 
-
-
-          <Route
-            path="admin"
-            element={
-              <div className="mx-auto max-w-7xl p-8 text-center text-stone-500">
-                <Settings className="mx-auto mb-4 h-12 w-12 opacity-50" />
-                <h2 className="text-xl font-bold">시스템 데이터 관리자</h2>
-                <p className="mt-2 text-sm">준비 중입니다.</p>
-              </div>
-            }
-          />
+          <Route path="admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+          <Route path="admin/pages" element={<ErrorBoundary><PageManager /></ErrorBoundary>} />
+          <Route path="admin/system" element={<ErrorBoundary><SystemDocumentation /></ErrorBoundary>} />
+          <Route path="admin/table-config" element={<ErrorBoundary><ProgramTableManager /></ErrorBoundary>} />
+          <Route path="admin/structure-viewer" element={<ErrorBoundary><ProgramStructureViewer /></ErrorBoundary>} />
+          <Route path="admin/api-config" element={<ErrorBoundary><ApiManager /></ErrorBoundary>} />
+          <Route path="admin/users" element={<ErrorBoundary><UserManager /></ErrorBoundary>} />
 
           <Route
             path="*"

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가락시장 경매 API 매뉴얼</title>
+    <style>
+        body { font-family: "Pretendard", sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { border-bottom: 2px solid #fd7e14; padding-bottom: 0.3em; margin-top: 24px; color: #c63300; }
+        code { background-color: #fff0eb; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; color: #c63300; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+        th, td { border: 1px solid #dfe2e5; padding: 8px; text-align: left; }
+        th { background-color: #fff5f2; }
+        .danger { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; border: 1px solid #f5c6cb; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>가락시장 실시간 경매 API 매뉴얼</h1>
+    <p><strong>출처</strong>: 서울시농수산식품공사 (가락시장)</p>
+
+    <h2>1. 개요</h2>
+    <p>가락시장의 전자 경매 낙찰 정보를 실시간으로 조회할 수 있는 API입니다.</p>
+
+    <h2>2. 엔드포인트</h2>
+    <code>http://www.garak.co.kr/homepage/publicdata/dataJsonOpen.do</code>
+
+    <h2>3. 요청 파라미터</h2>
+    <table>
+        <tr>
+            <th>파라미터</th>
+            <th>필수</th>
+            <th>값 / 설명</th>
+        </tr>
+        <tr>
+            <td><code>id</code></td>
+            <td>예</td>
+            <td>신청 승인된 ID (예: 5775)</td>
+        </tr>
+        <tr>
+            <td><code>passwd</code></td>
+            <td>예</td>
+            <td>비밀번호 (특수문자 주의)</td>
+        </tr>
+        <tr>
+            <td><code>dataid</code></td>
+            <td>예</td>
+            <td><code>data36</code> (경매낙찰정보 고정값)</td>
+        </tr>
+        <tr>
+            <td><code>s_date</code></td>
+            <td>예</td>
+            <td>조회 날짜 (YYYYMMDD)</td>
+        </tr>
+    </table>
+
+    <h2>4. 주요 응답 필드</h2>
+    <ul>
+        <li><code>PUM_NM</code>: 품목명 (예: 양파, 배추)</li>
+        <li><code>U_NAME</code>: 단위 (예: 20kg, 10kg 상자)</li>
+        <li><code>AV_P</code>: 평균가 (원)</li>
+        <li><code>MAX_P</code> / <code>MIN_P</code>: 최고가 / 최저가</li>
+    </ul>
+
+    <div class="danger">
+        <strong>⚠️ 트러블슈팅 가이드:</strong><br>
+        1. <strong>응답이 비어있음</strong>: <code>s_date</code>가 일요일이거나 공휴일(휴장일)인지 확인하세요.<br>
+        2. <strong>비밀번호 오류</strong>: 구형 시스템이므로 비밀번호에 특수문자(!@#)가 있으면 URL 인코딩 문제로 로그인이 실패할 수 있습니다. 비밀번호 변경을 권장합니다.
+    </div>
+</body>
+</html>

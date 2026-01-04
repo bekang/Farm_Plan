@@ -1,5 +1,12 @@
 import type { MarketCrop } from '@/types/market';
 
+// Interface for prediction history
+interface PriceHistoryRecord {
+  year: number;
+  price: number;
+  date: string;
+}
+
 // 1. Hangul Choseong Helper
 const CHOSEONG = [
   'ㄱ',
@@ -928,55 +935,60 @@ export const GarakMarketService = {
     // Encoding: EUC-KR is required officially, but we will try UTF-8 first via standard fetch.
 
     try {
-      // Using a CORS proxy might be needed in dev, but trying direct first.
-      // Note: dataid 'data12' is usually for daily price. The user image showed 'data36' but context suggests price search.
-      // Let's assume 'data12' (generic daily price) or attempt to replicate the screenshot EXACTLY if 'data36' is better.
-      // Screenshot 'data36' -> "품목별등급별가격". We will use that.
-
-      const today = new Date();
-      const yyyymmdd = today.toISOString().slice(0, 10).replace(/-/g, '');
-
-      const params = new URLSearchParams();
-      params.append('id', '5775');
-      params.append('passwd', '*suoho1004');
-      params.append('dataid', 'data12'); // data12 seems more common for price list, but image said data36. Let's try data12 for general search first.
-      params.append('pagesize', '10');
-      params.append('pageidx', '1');
-      params.append('portal.templet', 'false');
-      params.append('s_date', yyyymmdd);
-      params.append('p_pos_gubun', '1'); // Garak
-      params.append('s_pummok', normalizedQuery); // Browser will encode UTF-8. If server fails, fallback to Mock.
-
-      // Determine URL based on environment
-      // Use Vercel Serverless Function (/api/garak) which acts as a robust proxy
-      // This bypasses CORS and stricter firewall rules by running on the server side
-      const baseUrl = '/api/garak';
+      // 1. Fetch Master List from processed data (Real Market Items)
+      const masterRes = await fetch('/data/garak/aggregated/master_crop_list.json');
       
-      const response = await fetch(`${baseUrl}?${params.toString()}`);
+      // 2. Fetch Curated Info (Accurate Growing Days)
+      const infoRes = await fetch('/data/crop_info.json');
+      
+      if (masterRes.ok) {
+        const masterList = await masterRes.json();
+        const cropInfoList = infoRes.ok ? await infoRes.json() : [];
+        
+        // Build Info Map
+        const infoMap = new Map();
+        cropInfoList.forEach((info: any) => {
+            infoMap.set(info.name, info);
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        const list = data.list || data.data || [];
+        if (Array.isArray(masterList)) {
+           // Filter client-side
+           const results = masterList.filter((item: any) => 
+               item.name.includes(normalizedQuery)
+           ).map((item: any) => {
+                // Check if we have curated info for this crop (Partial match allowed e.g. "감자 수미" matches "감자")
+                let info = infoMap.get(item.name);
+                
+                // If exact match not found, try to find a base crop match (e.g. "쪽파(특)" -> "쪽파")
+                if (!info) {
+                    for (const key of infoMap.keys()) {
+                        if (item.name.startsWith(key)) {
+                            info = infoMap.get(key);
+                            break;
+                        }
+                    }
+                }
 
-        if (Array.isArray(list) && list.length > 0) {
-          return list.map((item: any) => ({
-            id: `real-${item.PUM_CODE || Math.random()}`,
-            name: item.PUM_NAME || normalizedQuery,
-            category: '실시간 데이터',
-            standardUnit: item.UNIT_NAME || item.U_NAME || 'kg',
-            units: [item.UNIT_NAME || item.U_NAME || 'kg'],
-            keywords: [],
-            defaultYield: 0,
-            defaultPrice: parseInt(item.AVR_PRICE || item.AV_P || 0),
-            growingDays: 90,
-          }));
+                return {
+                    id: `real-${Math.random().toString(36).substr(2, 9)}`,
+                    name: `${item.name}`,
+                    category: item.category || '농산물',
+                    standardUnit: item.units?.[0] || 'kg',
+                    units: item.units && item.units.length > 0 ? item.units : ['kg'],
+                    grades: item.grades || [],
+                    keywords: [],
+                    defaultYield: info?.defaultYield || 0,
+                    defaultPrice: item.recentPrice || 0,
+                    growingDays: info?.growingDays || 90, // Fallback to 90 if unknown
+                    description: info?.description // Optional extra info
+                };
+           });
+           
+           if (results.length > 0) return results;
         }
-      } else {
-        console.warn(`Garak API Error: ${response.status} ${response.statusText}`);
       }
     } catch (e) {
-      console.warn('Real API Call failed (CORS/Network), using built-in data:', e);
-      // Continue to fallback
+      console.warn('Failed to load master crop list, falling back to mock.', e);
     }
 
     // 2. Fallback to Mock Data (Client-side filtering)
@@ -997,6 +1009,95 @@ export const GarakMarketService = {
     });
 
     return mockResults;
+  },
+
+  /**
+   * Fetches historical price data to simulate future revenue.
+   * Logic: 
+   * 1. Calculate the 'reference date' (Target Date - 1 Year).
+   * 2. Fetch Garak Market data for that period.
+   * 3. Return the average price.
+   */
+  /**
+   * Fetches historical price data to simulate future revenue.
+   * Logic: 
+   * 1. Calculate the 'reference date' (Target Date - 1 Year).
+   * 2. Check local NAS Cache (market_history.json).
+   * 3. Return the average price if found, else fallback.
+   */
+  /**
+   * Fetches historical price data to simulate future revenue.
+   * Logic: 
+   * 1. Calculate the 'reference date' (Target Date - 1 Year).
+   * 2. Try to fetch the specific daily file from NAS Cache: /data/market/{year}/{date}.json
+   * 3. If not found, try +/- 3 days range.
+   * 4. Return the average price if found, else fallback.
+   */
+  /**
+   * Fetches historical price data to simulate future revenue.
+   * Logic: 
+   * 1. Calculate the 'reference date' (Target Date - 1 Year).
+   * 2. Fetch the aggregated crop file: /data/processed/crops/{cropName}.json
+   * 3. Find the closest record to the reference date.
+   */
+  getHistoricalPrice: async (cropName: string, targetDate: Date): Promise<number> => {
+    // 1. Calculate Reference Date (1 Year Ago)
+    const refDate = new Date(targetDate);
+    refDate.setFullYear(refDate.getFullYear() - 1);
+    
+    // Safety
+    const today = new Date();
+    if (refDate > today) {
+       refDate.setFullYear(today.getFullYear() - 1);
+    }
+    
+    // Sanitize filename
+    const safeName = cropName.replace(/[\/\\?%*:|"<>]/g, '_');
+    const url = `/data/garak/aggregated/crops/${encodeURIComponent(safeName)}.json?t=${new Date().getTime()}`; // Bust cache for now
+
+    console.log(`[MarketService] Fetching processed history for ${cropName}`);
+
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const json = await res.json();
+        const records = json.data || [];
+        
+        if (records.length > 0) {
+            // Find closest date
+            // Records are sorted by date. We can use binary search or just linear (array size ~1500 for 5 years)
+            const pad = (n: number) => n.toString().padStart(2, '0');
+            const targetYMD = `${refDate.getFullYear()}-${pad(refDate.getMonth() + 1)}-${pad(refDate.getDate())}`;
+            
+            // Simple Linear Search for closest date
+            let closest = records[0];
+            let minDiff = Infinity;
+            
+            const targetTime = new Date(targetYMD).getTime();
+
+            for (const rec of records) {
+                const recTime = new Date(rec.date).getTime();
+                const diff = Math.abs(recTime - targetTime);
+                
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closest = rec;
+                }
+            }
+            
+            // Allow if within reason (e.g. 7 days). If gap is too huge, maybe data is missing.
+            const daysDiff = minDiff / (1000 * 60 * 60 * 24);
+            if (daysDiff <= 7) {
+                 return closest.price; 
+            }
+        }
+      }
+    } catch (e) {
+      console.warn(`[MarketService] Failed to load processed data for ${cropName}`, e);
+    }
+
+    const fallbackCrop = MOCK_CROPS.find(c => c.name === cropName);
+    return fallbackCrop ? fallbackCrop.defaultPrice : 0;
   },
 
   // Recommend Crops based on Environment
@@ -1046,4 +1147,124 @@ export const GarakMarketService = {
 
     return Array.from(results.values());
   },
+
+  /**
+   * Price Prediction Logic
+   * Uses historical data from Garak Market (or specific market if data available)
+   * to predict price at harvest date by averaging past 3 years.
+   */
+  predictPrice: async (
+    cropName: string,
+    marketName: string,
+    unitName: string,
+    harvestDate: string // YYYY-MM-DD
+  ): Promise<{ price: number; confidence: number; history: any[] }> => {
+     console.log(`Predicting for ${cropName} at ${marketName} (${unitName}) on ${harvestDate}`);
+     
+     // 1. Calculate Target Month/Day for historical lookup
+     const target = new Date(harvestDate);
+     const requestMonth = target.getMonth() + 1;
+     const requestDay = target.getDate();
+     
+     // 2. Fetch Historical Data (We use the Master List & Processed Crops for now)
+     // Ideally we dig into specific market data, but we'll use the Aggregated Garak Data as proxy
+     // since specific wholesale market data API is currently unauthorized.
+     
+     const safeName = cropName.replace(/[\/\\?%*:|"<>]/g, '_');
+     const url = `/data/garak/aggregated/crops/${encodeURIComponent(safeName)}.json`;
+     
+     try {
+         const res = await fetch(url);
+         if (!res.ok) throw new Error('No historical data');
+         const json = await res.json();
+         const records = json.data || [];
+
+         const history: PriceHistoryRecord[] = [];
+         let totalSum = 0;
+         let count = 0;
+         
+         // 3. Look back 3-5 years around the same date (+/- 5 days)
+         for (let yearOffset = 1; yearOffset <= 5; yearOffset++) {
+             const pastYear = target.getFullYear() - yearOffset;
+             
+             // Define window
+             // Simple approach: check all records, calculate Day-of-Year match
+             // Faster approach: String filter YYYY-MM-DD
+             
+             // Let's filter records that match the year and month
+             const relevantRecords = records.filter((r: any) => {
+                 const d = new Date(r.date);
+                 return d.getFullYear() === pastYear && d.getMonth() + 1 === requestMonth;
+             });
+             
+             // Find closest day
+             let bestRecord: any = null;
+             let minDiff = 100;
+             
+             relevantRecords.forEach((r: any) => {
+                 const d = new Date(r.date);
+                 const diff = Math.abs(d.getDate() - requestDay);
+                 if (diff < minDiff) {
+                     minDiff = diff;
+                     bestRecord = r;
+                 }
+             });
+             
+             if (bestRecord && minDiff <= 7) {
+                 history.push({ year: pastYear, price: bestRecord.price, date: bestRecord.date });
+                 totalSum += bestRecord.price;
+                 count++;
+             }
+         }
+         
+         if (count > 0) {
+             const avg = Math.floor(totalSum / count);
+             return { price: avg, confidence: 0.8, history };
+         }
+         
+     } catch (e) {
+         console.warn('Prediction failed', e);
+     }
+     
+     // Fallback
+     return { price: 0, confidence: 0, history: [] };
+  },
+
+  getMarkets: async (cropName: string): Promise<string[]> => {
+      // Fetch metadata
+      try {
+          const res = await fetch('/data/market_metadata.json');
+          const meta = await res.json();
+          // Check specific mapping
+          if (meta.crop_mapping && meta.crop_mapping[cropName]) {
+              return meta.crop_mapping[cropName].markets;
+          }
+          return meta.markets; // Return all if no specific map
+      } catch (e) {
+          return ['서울가락도매시장', '구리도매시장'];
+      }
+  },
+  
+  getUnits: async (cropName: string): Promise<string[]> => {
+      try {
+          const res = await fetch('/data/market_metadata.json');
+          const meta = await res.json();
+          if (meta.crop_mapping && meta.crop_mapping[cropName]) {
+              return meta.crop_mapping[cropName].units;
+          }
+          
+          // Or fetch from Master List to see actual units?
+          // We can use the service we already built
+          const masterRes = await fetch('/data/garak/aggregated/master_crop_list.json');
+          if (masterRes.ok) {
+              const list = await masterRes.json();
+              const item = list.find((c: any) => c.name === cropName);
+              if (item && item.units && item.units.length > 0) return item.units;
+          }
+          
+          return meta.units;
+      } catch (e) {
+          return ['1kg', '10kg'];
+      }
+  }
 };

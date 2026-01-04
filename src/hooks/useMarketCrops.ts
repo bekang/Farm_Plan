@@ -24,3 +24,40 @@ export function useMarketRecommendations(location: string, facilityType: string)
     staleTime: 1000 * 60 * 60 * 24, // 24 hours (Recommendations are seasonal)
   });
 }
+
+export function useHistoricalPrice(cropName: string | undefined, targetDate: string | undefined) {
+  return useQuery({
+    queryKey: [...GARAK_KEYS.all, 'price', cropName, targetDate],
+    queryFn: async () => {
+        if (!cropName || !targetDate) return 0;
+        return GarakMarketService.getHistoricalPrice(cropName, new Date(targetDate));
+    },
+    enabled: !!cropName && !!targetDate, // Only fetch when both are present
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+}
+
+export function useCropPrediction(crop: string, market: string, unit: string, harvestDate: string) {
+  return useQuery({
+    queryKey: [...GARAK_KEYS.all, 'predict', crop, market, unit, harvestDate],
+    queryFn: () => GarakMarketService.predictPrice(crop, market, unit, harvestDate),
+    enabled: !!crop && !!market && !!unit && !!harvestDate,
+    staleTime: 1000 * 60 * 60,
+  });
+}
+
+export function useMarketOptions(crop: string) {
+  return useQuery({
+    queryKey: [...GARAK_KEYS.all, 'markets', crop],
+    queryFn: () => GarakMarketService.getMarkets(crop),
+    enabled: !!crop,
+  });
+}
+
+export function useUnitOptions(crop: string) {
+  return useQuery({
+    queryKey: [...GARAK_KEYS.all, 'units', crop],
+    queryFn: () => GarakMarketService.getUnits(crop),
+    enabled: !!crop,
+  });
+}

@@ -13,8 +13,15 @@ import {
   HelpingHand,
   Tractor,
   Link as LinkIcon,
+  Calendar,
+  FileText,
+  Database,
+  Key,
+  Users,
+  TableProperties,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { USER_MENU_ITEMS } from '@/config/menuConfig';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { FloatingChatBot } from '@/components/features/FloatingChatBot';
@@ -23,24 +30,37 @@ import { GlobalHeaderWidgets } from '@/components/layout/GlobalHeaderWidgets';
 export const RootLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
-  // Role State (Mock: Toggleable for demo)
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Role State with Persistence
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return typeof window !== 'undefined' ? sessionStorage.getItem('isAdmin') === 'true' : false;
+  });
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  
+  const handleToggleAdmin = () => {
+      const newState = !isAdmin;
+      setIsAdmin(newState);
+      sessionStorage.setItem('isAdmin', String(newState));
+  };
 
   // Filter Menus based on Role
+  // Load hidden menu items
+  const hiddenMenuIds = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('hidden_menu_items') || '[]') : [];
+  
+  // Import Config (Assuming import is added at top, but I need to add import line too. Since I can't do two edits in one replace without overlap, I'll do the logic first then import)
+  // Actually, I can't use USER_MENU_ITEMS without import. 
+  // I will replace the logic here with a temporary robust version, then add import in next step.
   const menuItems = isAdmin
-    ? [{ name: '데이터 관리자', icon: Settings, path: '/dashboard/admin' }]
-    : [
-        { name: '대시보드', icon: LayoutDashboard, path: '/dashboard' },
-        { name: '농지 경영 장부', icon: Wallet, path: '/dashboard/financial-ledger' }, // Added
-        { name: '종합 영농 컨설팅', icon: Sprout, path: '/dashboard/consulting-report' }, // Added
-        { name: '내 농지 관리', icon: Sprout, path: '/dashboard/farm-dashboard' },
-        { name: '농지별 작기 계획하기', icon: Calculator, path: '/dashboard/planning' },
-        { name: '지원사업 찾기', icon: HelpingHand, path: '/dashboard/support-programs' }, // New
-        { name: '농기계 임대사업소 찾기', icon: Tractor, path: '/dashboard/machinery-rental' }, // New
-        { name: '관련 링크 관리', icon: LinkIcon, path: '/dashboard/link-management' }, // New
-      ];
+      ? [
+        { name: '데이터 관리자', icon: Settings, path: '/dashboard/admin' },
+        { name: '재무 증빙 목록', icon: FileText, path: '/dashboard/financial-evidence' },
+        { name: '컨설팅 리포트', icon: Database, path: '/dashboard/consulting-evidence' },
+        { name: '프로그램 테이블 키 관리', icon: TableProperties, path: '/dashboard/admin/table-config' },
+        { name: '프로그램 테이블 관리', icon: LayoutDashboard, path: '/dashboard/admin/structure-viewer' },
+        { name: 'API 키 관리', icon: Key, path: '/dashboard/admin/api-config' },
+        { name: '사용자 관리', icon: Users, path: '/dashboard/admin/users' },
+      ]
+    : USER_MENU_ITEMS.filter(item => !hiddenMenuIds.includes(item.id));
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
@@ -127,9 +147,9 @@ export const RootLayout: React.FC = () => {
                   변강현 {isAdmin ? '관리자' : '농부'}님
                 </span>
                 <button
-                  onClick={() => setIsAdmin(!isAdmin)}
+                  onClick={handleToggleAdmin}
                   className="text-[10px] text-blue-500 underline hover:text-blue-700"
-                  title="클릭하여 모드 전환 (테스트용)"
+                  title="클릭하여 모드 전환"
                 >
                   [{isAdmin ? '사용자 모드로 전환' : '관리자 모드로 전환'}]
                 </button>

@@ -1,0 +1,29 @@
+{
+  "updatedAt": "2026-01-04T07:33:38.451Z",
+  "data": [
+    {
+      "cropName": "고추",
+      "pestName": "탄저병",
+      "riskLevel": "주의",
+      "date": "2026-01-04"
+    },
+    {
+      "cropName": "배추",
+      "pestName": "벼룩잎벌레",
+      "riskLevel": "보통",
+      "date": "2026-01-04"
+    },
+    {
+      "cropName": "사과",
+      "pestName": "갈색무늬병",
+      "riskLevel": "예보",
+      "date": "2026-01-04"
+    },
+    {
+      "cropName": "마늘",
+      "pestName": "잎마름병",
+      "riskLevel": "주의",
+      "date": "2026-01-04"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // base: '/Farm_Plan/', // Commented out for Vercel (Root domain)
+  base: './', // Relative path for local filesystem check
   server: {
     host: true, // Allow external access (0.0.0.0)
     proxy: {

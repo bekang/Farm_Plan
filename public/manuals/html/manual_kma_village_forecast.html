@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기상청 단기예보 API 매뉴얼</title>
+    <style>
+        body { font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 24px; }
+        code { background-color: #f6f8fa; padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; color: #0056b3; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+        th, td { border: 1px solid #dfe2e5; padding: 8px; text-align: left; }
+        th { background-color: #e3f2fd; }
+        .info-box { background-color: #e8f5e9; border-left: 5px solid #4caf50; padding: 15px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>기상청 단기예보(Village Forecast) 매뉴얼</h1>
+    <p><strong>출처</strong>: 기상청 (공공데이터포털)</p>
+
+    <h2>1. 개요</h2>
+    <p>특정 격자(좌표) 지점의 단기 날씨 예보(기온, 강수확률, 하늘상태 등)를 조회합니다.</p>
+
+    <h2>2. 엔드포인트</h2>
+    <code>http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst</code>
+
+    <h2>3. 요청 파라미터</h2>
+    <table>
+        <tr>
+            <th>파라미터</th>
+            <th>설명</th>
+            <th>주의사항</th>
+        </tr>
+        <tr>
+            <td><code>serviceKey</code></td>
+            <td>인증키</td>
+            <td><strong>Encoding 된 키 사용</strong> (이중 인코딩 주의)</td>
+        </tr>
+        <tr>
+            <td><code>base_date</code></td>
+            <td>발표 일자</td>
+            <td>YYYYMMDD</td>
+        </tr>
+        <tr>
+            <td><code>base_time</code></td>
+            <td>발표 시각</td>
+            <td>HHMM (예: 0500)</td>
+        </tr>
+        <tr>
+            <td><code>nx</code>, <code>ny</code></td>
+            <td>예보 지점 좌표</td>
+            <td>위경도가 아닌 <strong>기상청 격자 좌표</strong> 사용</td>
+        </tr>
+    </table>
+
+    <div class="info-box">
+        <h3>💡 Base Time (발표 시각) 규칙</h3>
+        <p>하루 8번 업데이트 됩니다. 현재 시간보다 <strong>이전의 가장 가까운 시간</strong>을 호출해야 합니다.</p>
+        <p><strong>02:00, 05:00, 08:00, 11:00, 14:00, 17:00, 20:00, 23:00</strong></p>
+    </div>
+
+    <h2>4. 주요 응답 코드 (카테고리)</h2>
+    <ul>
+        <li><strong>TMP</strong>: 1시간 기온 (℃)</li>
+        <li><strong>REH</strong>: 습도 (%)</li>
+        <li><strong>SKY</strong>: 하늘 상태 (1:맑음, 3:구름많음, 4:흐림)</li>
+        <li><strong>PTY</strong>: 강수 형태 (0:없음, 1:비, 2:비/눈, 3:눈)</li>
+        <li><strong>POP</strong>: 강수 확률 (%)</li>
+    </ul>
+</body>
+</html>

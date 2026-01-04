@@ -8,9 +8,11 @@ export const NonsaroApi = {
     try {
         // Example: Searching variety info to get crop list
         // Path: /service/varietyInfo/getVarietyList
-        // Note: apiKey is now injected by the server-side proxy (api/nongsaro.js)
-        const path = '/service/varietyInfo/getVarietyList';
-        const url = `/api/nongsaro?path=${path}&svcCode=SVC01&serviceType=AA001&subCategoryCode=CROP&cropName=${encodeURIComponent(query)}`;
+        // Path: /service/varietyInfo/getVarietyList
+        // Direct PHP Proxy call for NAS
+        // Nongsaro uses 'apiKey' parameter
+        const internalPath = 'service/varietyInfo/getVarietyList';
+        const url = `/proxy.php?path=nongsaro/${internalPath}&apiKey=${API_KEY}&svcCode=SVC01&serviceType=AA001&subCategoryCode=CROP&cropName=${encodeURIComponent(query)}`;
 
         const response = await fetch(url);
         if (!response.ok) return [];

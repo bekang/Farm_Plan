@@ -20,7 +20,8 @@ echo.
 echo [2/3] NAS 웹 폴더 경로를 입력하세요.
 echo (예: N:\web  또는  \\192.168.0.4\HDD1\public_html)
 echo.
-set /p NAS_PATH="경로 입력: "
+set NAS_PATH=\\192.168.0.6\web
+REM set /p NAS_PATH="경로 입력: "
 
 if not exist "%NAS_PATH%" (
     echo.
@@ -45,7 +46,7 @@ echo.
 :: /NP  : No Progress - don't show percentage copied
 :: /MT:8 : Multi-threaded copy (8 threads)
 
-robocopy "%~dp0dist" "%NAS_PATH%" /MIR /R:3 /W:2 /MT:8
+robocopy "%~dp0dist" "%NAS_PATH%" /E /R:3 /W:2 /MT:8
 
 :: Robocopy exit codes:
 :: 0 = No errors occurred, and no copying was done. (Source and destination are in sync)

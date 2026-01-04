@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>토양환경정보 API 기술매뉴얼</title>
+    <style>
+        body { font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; word-break: keep-all; }
+        h1, h2, h3 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 24px; font-weight: 700; color: #111; }
+        code { background-color: #f6f8fa; padding: 0.2em 0.4em; border-radius: 3px; font-family: "D2Coding", Consolas, Monaco, monospace; font-size: 85%; color: #e83e8c; }
+        pre { background-color: #f6f8fa; padding: 16px; overflow: auto; border-radius: 6px; }
+        table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+        th, td { border: 1px solid #dfe2e5; padding: 8px 12px; }
+        th { background-color: #f8f9fa; font-weight: 600; text-align: left; }
+        .badge { display: inline-block; padding: 0.25em 0.4em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; color: #fff; background-color: #007bff; }
+        .note { background-color: #e7f5ff; color: #0c5460; padding: 15px; border-radius: 4px; border-left: 5px solid #007bff; margin: 20px 0; }
+        .warm { background-color: #fff3cd; color: #856404; padding: 15px; border-radius: 4px; border-left: 5px solid #ffeeba; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>토양환경정보(Soil Info) API 매뉴얼</h1>
+    <p>
+        <strong>서비스명</strong>: 토양 검정 정보 (Soil Info)<br>
+        <strong>출처</strong>: 공공데이터포털 (농촌진흥청)<br>
+        <strong>검증 상태</strong>: <span class="badge">검증 완료</span>
+    </p>
+
+    <h2>1. 개요</h2>
+    <p>필지(지번) 단위의 상세 토양 화학적 특성(산도, 유기물 함량 등) 데이터를 제공합니다.</p>
+
+    <h2>2. API 엔드포인트</h2>
+    <ul>
+        <li><strong>기본 URL</strong>: <code>http://apis.data.go.kr/1390802/SoilEnviron/SoilExam/V2</code></li>
+        <li><strong>상세 오퍼레이션</strong>: <code>/getSoilExamList</code></li>
+    </ul>
+
+    <h2>3. 요청 파라미터 (검증됨)</h2>
+    <table>
+        <thead>
+            <tr><th>파라미터</th><th>타입</th><th>필수</th><th>설명</th><th>예시</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>serviceKey</code></td><td>String</td><td><strong>Yes</strong></td><td>공공데이터포털 인증키 (Encoding)</td><td><code>...</code></td></tr>
+            <tr><td><code>PNU_Code</code></td><td>String</td><td><strong>선택(중요)</strong></td><td>19자리 법정동 필지 코드</td><td><code>42150..</code></td></tr>
+            <tr><td><code>STDG_CD</code></td><td>String</td><td><strong>선택</strong></td><td>10자리 법정동 코드 (동/리 단위)</td><td><code>51150..</code></td></tr>
+            <tr><td><code>type</code></td><td>String</td><td>No</td><td>응답 포맷</td><td><code>xml</code></td></tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        <strong>💡 파라미터 사용 팁:</strong><br>
+        - <strong>PNU_Code</strong>: 특정 농장의 흙 상태를 보려면 반드시 이 코드를 사용하세요. (지목+지번 포함)<br>
+        - <strong>STDG_CD</strong>: 마을(동/리) 전체의 평균적인 경향을 볼 때 사용합니다.<br>
+        <em>주의: 두 코드를 동시에 넣으면 오류가 발생하거나 결과가 정확하지 않을 수 있습니다. <code>PNU_Code</code> 우선 사용을 권장합니다.</em>
+    </div>
+
+    <h2>4. 주요 응답 데이터</h2>
+    <ul>
+        <li><code>ACID</code>: 산도 (pH) - 작물 재배 적정 범위(6.0~7.0) 확인용</li>
+        <li><code>OM</code>: 유기물 함량 (Organic Matter)</li>
+        <li><code>PHOS</code>: 유효 인산 (Valid Phosphate)</li>
+        <li><code>SILIC</code>: 유효 규산 (Valid Silicic Acid)</li>
+    </ul>
+
+    <h2>5. 참고 자료</h2>
+    <ul>
+        <li><a href="https://www.data.go.kr/data/15000000/openapi.do" target="_blank">공공데이터포털: 토양환경정보 상세 페이지</a></li>
+    </ul>
+</body>
+</html>
